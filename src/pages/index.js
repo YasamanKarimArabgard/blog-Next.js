@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { AdjustmentsHorizontalIcon, BookmarkIcon, ChatBubbleBottomCenterIcon, ChevronDownIcon, HeartIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
+import BlogsList from "@/components/blogs/BlogsList";
+import axios from "axios";
 
-export default function Home() {
+export default function Home({ blogsData }) {
 
   const [isOpen, setIsOpen] = useState(false);
+  console.log(blogsData);
 
   return (
     <div className="bg-gray-50">
@@ -43,45 +46,22 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="md:col-span-9 grid grid-cols-6 gap-8">{
-            [1, 2, 3, 4, 5, 6].map(index => (
-              <div className="col-span-6 md:col-span-3 lg:col-span-2 bg-white rounded-xl p-2">
-                {/* image content */}
-                <div className="w-full h-auto">
-                  <img src="#"></img>
-                </div>
-                {/* blog content */}
-                <div className="bg-gray-100 h-40 p-2 rounded-xl flex flex-col justify-between">
-                  <h2 className="text-2xl">title</h2>
-                  <div className="h-1/2 flex flex-col justify-between">
-                    <div className="flex justify-between items-center">
-                      <div className="w-1/3 flex justify-between items-center">
-                        <img src="#" className="w-7 h-7 rounded-full" />
-                        <span className="text-lg">username</span>
-                      </div>
-                      <span className="bg-blue-200 text-blue-600 px-2 rounded-xl text-xl">course</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex justify-between items-center gap-x-2">
-                        <span className="px-2 py-1 bg-gray-200 rounded-md">
-                          <ChatBubbleBottomCenterIcon className="w-6 h-6 text-gray-500" />
-                        </span>
-                        <span className="px-2 py-1 bg-blue-100 rounded-md">
-                          <BookmarkIcon className="w-6 h-6 text-blue-400" />
-                        </span>
-                        <span className="px-2 py-1 bg-red-100 rounded-md">
-                          <HeartIcon className="w-6 h-6 text-red-500" />
-                        </span>
-                      </div>
-                      <span className="text-lg text-gray-500">time</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))
-          }</div>
+          <div className="md:col-span-9 grid grid-cols-6 gap-8">
+            <BlogsList blogsData={blogsData} />
+          </div>
         </div>
       </div>
     </div>
   )
+}
+
+export async function getServerSideProps(context) {
+
+  const { data: result } = await axios.get("http://localhost:5000/api/posts");
+  const { data } = result;
+  return {
+    props: {
+      blogsData: data
+    }
+  }
 }
