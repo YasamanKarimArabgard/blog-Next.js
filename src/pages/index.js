@@ -4,10 +4,10 @@ import { useState } from "react";
 import BlogsList from "@/components/blogs/BlogsList";
 import axios from "axios";
 
-export default function Home({ blogsData }) {
+export default function Home({ blogsData, postcategories }) {
 
   const [isOpen, setIsOpen] = useState(false);
-  console.log(blogsData);
+  console.log(postcategories);
 
   return (
     <div className="bg-gray-50">
@@ -17,19 +17,21 @@ export default function Home({ blogsData }) {
             <div className="bg-white rounded-xl overflow-hidden">
               {/* acc header */}
               <div className="flex justify-between items-center p-4 bg-purple-200 cursor-pointer" onClick={() => setIsOpen((prevState) => !prevState)}>
-                <span>دسته بندي مقالات</span>
+                <span className="text-xl">دسته بندي مقالات</span>
                 <ChevronDownIcon className={`w-6 h-6 text-purple-500 ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
               </div>
               {/* acc content */}
               <div className={`py-2 ${isOpen ? 'block' : 'hidden'}`}>
-                <Link href='#'>
-                  <a className="block px-4 hover:bg-purple-50">ري اكت</a>
+                <Link href={`/blogs`}>
+                  <a className="block px-4 hover:bg-purple-50 text-xl py-1">همه مقالات</a>
                 </Link>
-                <Link href='#'>
-                  <a className="block px-4 hover:bg-purple-50">همه مقالات</a>
-                </Link><Link href='#'>
-                  <a className="block px-4 hover:bg-purple-50">علمي</a>
-                </Link>
+                {
+                  postcategories.map((category) => (
+                    <Link href={`/blogs/${category.englishTitle}`} key={category.id}>
+                      <a className="block px-4 hover:bg-purple-50 text-2xl py-1">{category.title}</a>
+                    </Link>
+                  ))
+                }
               </div>
             </div>
           </div>
@@ -58,10 +60,13 @@ export default function Home({ blogsData }) {
 export async function getServerSideProps(context) {
 
   const { data: result } = await axios.get("http://localhost:5000/api/posts");
+  const { data: postcategories } = await axios.get("http://localhost:5000/api/post-category");
+
   const { data } = result;
   return {
     props: {
-      blogsData: data
+      blogsData: data,
+      postcategories: postcategories.data,
     }
   }
 }
